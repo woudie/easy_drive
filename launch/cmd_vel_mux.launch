@@ -1,0 +1,10 @@
+<launch>
+    <node name="cmd_vel_mux" pkg="easy_drive" type="cmd_vel_mux" clear_params="true" output="log" respawn="true">
+        <param name="block_duration" type="int" value="5"/>
+        <!-- INPUT TOPICS -->
+        <remap from="teleop/cmd_vel" to="teleop/cmd_vel"/>
+        <remap from="move_base/cmd_vel" to="teleop/cmd_vel" />
+        <!-- OUTPUT TOPIC -->
+        <remap from="cmd_vel" to="cmd_vel" />
+    </node>
+</launch>

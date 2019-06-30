@@ -1,0 +1,24 @@
+<package>
+  <name>easy_drive</name>
+  <version>0.0.0</version>
+  <description>
+      A barebones and easy to use robot drive package based on R3s simple_drive package. Utilizes rosserial to communicate with robot motors via microcontroller.
+  </description>
+  <maintainer email="stwoudie@gmail.com">woudie</maintainer>
+  <author email="stwoudie@gmail.com">woudie</author>
+  <license>TODO</license>
+  <url type="repository">https://github.com/woudie/easy_drive</url> 
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>actionlib_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>actionlib_msgs</run_depend>
+  <run_depend>std_msgs</run_depend>
+
+</package>

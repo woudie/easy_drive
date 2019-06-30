@@ -1,0 +1,6 @@
+<launch>
+    <!-- Joystick Node -->
+    <include file="$(find easy_drive)/launch/drive_teleop.launch" pass_all_args="true" />
+    <!-- Multiplexer for drive commands -->
+    <include file="$(find easy_drive)/launch/cmd_vel_mux.launch" />
+</launch>
