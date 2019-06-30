@@ -8,19 +8,15 @@
 
 void drive_callback(const geometry_msgs::Twist& drive_msg);
 
-// Left Motor Control
-#define enA 5
-#define in1 7
-#define in2 8
+#define pinL 5
+#define pinR 6
 
-// Right Motor Control
-#define enB 6
-#define in3 9
-#define in4 11
+Servo leftMotors;
+Servo rightMotors;
 
 // PWM specs of L298N H-Bridge (Change according to your motor specs)
-#define controllerMax 0   // Default full-reverse input pulse
-#define controllerMin 255 // Default full-forward input pulse
+#define controllerMax 1000   // Default full-reverse input pulse
+#define controllerMin 2000 // Default full-forward input pulse
 
 ros::NodeHandle nh;
 double lin, ang;
@@ -67,62 +63,25 @@ void setWheelVelocity(int left, int right)
     int theLeft = map(left, -100, 100, controllerMin, controllerMax);
     int theRight = map(right, -100, 100, controllerMin, controllerMax);
 
-    if (left > 0.0 && right > 0.0)
-    { // Going Forwards
-        motor_set(1);
-        analogWrite(enA, 255 - theLeft);
-        analogWrite(enB, 255 - theRight);
-    }
-    else if (left < 0 && right < 0)
-    { // Going Backwards
-        motor_set(2);
-        analogWrite(enA, theLeft);
-        analogWrite(enB, theRight);
-    }
-    else if (left >= 0 && right <= 0)
-    { // Turning Right
-        motor_set(3);
-        analogWrite(enA, 255 - theLeft);
-        analogWrite(enB, 255 - theRight);
-    }
-    else if (left <= 0 && right >= 0)
-    { // Turning Left
-        motor_set(4);
-        analogWrite(enA, 255 - theLeft);
-        analogWrite(enB, 255 - theRight);
-    }
-    else
-    {
-        motor_set(0);
-        analogWrite(enA, 0);
-        analogWrite(enB, 0);
-    }
+    leftMotors.writeMicrosecond(theLeft);
+    rightMotors.writeMicrosecond(theRight);
+
 }
 
 void drive_callback(const geometry_msgs::Twist &drive_msg)
 {
-
-    lin = -1.0 * drive_msg.linear.x;
-    ang = -1.0*drive_msg.angular.z;
-
-    if (lin != 0.0 || ang != 0.0)
-    {
-        setWheelVelocity((int)((lin + ang) * 100), (int)((lin - ang) * 100));
-    }
-    else
-    {
-        motor_set(0);
-    }
+    
+    lin = drive_msg.linear.x;
+    ang = drive_msg.angular.z;
+        
+    setWheelVelocity((int)((lin + ang) * 100), (int)((lin - ang) * 100));
 }
 
 void setup(){
     Serial.begin(57600);
-    pinMode(enA, OUTPUT);
-    pinMode(enB, OUTPUT);
-    pinMode(in1, OUTPUT);
-    pinMode(in2, OUTPUT);
-    pinMode(in3, OUTPUT);
-    pinMode(in4, OUTPUT);
+
+    Servo.attach(pinL);
+    Servo.attach(pinR);
 
     nh.initNode();
     nh.subscribe(sub);
