@@ -1,6 +1,5 @@
 <launch>
     <arg name="joy_id" default="/dev/input/js0"/>
-    <arg name="serial_id" default="/dev/ttyACM0"/>
 
     <!-- Joystick Node -->
     <node name="joy_drive" pkg="joy" type="joy_node" clear_params="true" output="log" respawn="true">
@@ -8,14 +7,6 @@
         <param name="deadzone" value="0.12" />
         <!-- OUTPUT TOPIC -->
         <remap from="joy" to="joy" />
-    </node>
-
-    <!-- Rosserial Node (Communicates with microcontroller) -->
-    <node pkg="rosserial_python" type="serial_node.py" name="easy_drive_mc" clear_params="true" output="screen" respawn="true">
-      <param name="port" value="$(arg serial_id)" />
-      <param name="baud" value="57600" />
-      <!-- INPUT TOPICS -->
-      <remap from="cmd_vel" to="cmd_vel" />
     </node>
 
     <!--Teleop Node -->
