@@ -1,6 +1,9 @@
 <launch>
     <arg name="joy_id" default="/dev/input/js0"/>
 
+    <!-- Reconfigurable parameter server for easy_drive params-->
+    <node name="drive_param_server" pkg="easy_drive" type="config_server"/>
+    
     <!-- Joystick Node -->
     <node name="joy_drive" pkg="joy" type="joy_node" clear_params="true" output="log" respawn="true">
         <param name="dev" value="$(arg joy_id)" />
