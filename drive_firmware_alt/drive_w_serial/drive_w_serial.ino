@@ -49,9 +49,11 @@ void drive_callback(const geometry_msgs::Twist &drive_msg)
 void setup()
 {
   SWSerial.begin(9600); // 9600 is the default baud rate for Sabertooth packet serial.
-  pinROS.begin(57600);
-  //FrontST.autobaud();
-  //RearST.autobaud();
+  //pinROS.begin(57600);
+  nh.getHardware()->setBaud(115200);
+  FrontST.autobaud();
+  RearST.autobaud();
+  
   nh.initNode();
   nh.subscribe(sub);
 }
