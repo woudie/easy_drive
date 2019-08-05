@@ -7,6 +7,8 @@
 #include <ros.h>
 #include <geometry_msgs/Twist.h>
 #include <std_msgs/Float32MultiArray.h>
+#include <std_msgs/Int16.h>
+
 
 /**
  * Arduino Mega Pin Definitions
@@ -23,13 +25,17 @@
  * A9 -> Battery 2 Cell 4
  * A10 -> Battery 2 Cell 5
  * A11 -> Battery 2 Cell 6
+ * Pin 48 -> High Beam Lights output
+ * Pin 49 -> Low Beam Lights output
+ * Pin 50 -> Reverse Beam Lights output
  */
 
 /**
  * ===================================
  *              NOTES
  * ===================================
- * Battery Monitor is untest, set use_bat to 0 to disable function
+ * Battery Monitor is untested, set use_bat to 0 to disable function
+ * Light Control is untested, set use_lights to 0 to disable function
  */
 
 SoftwareSerial SWSerial(NOT_A_PIN, 14);
@@ -41,7 +47,7 @@ void drive_callback(const geometry_msgs::Twist &drive_msg);
 #define BL 1
 #define BR 2
 
-int use_batt = 1;
+int use_batt = 1, use_lights = 1;
 
 Sabertooth FrontST(128, SWSerial); //Address 128 Dip Switches (000111)
 Sabertooth RearST(129, SWSerial);  //Address 130 Dip Switches (000101) Address 129 did not work for some reason
@@ -52,6 +58,9 @@ Sabertooth RearST(129, SWSerial);  //Address 130 Dip Switches (000101) Address 1
 
 ros::NodeHandle nh;
 ros::Subscriber<geometry_msgs::Twist> sub("cmd_vel", drive_callback);
+ros::Subscriber<std_msgs::Int16> sub1("high_beams", h_callback);
+ros::Subscriber<std_msgs::Int16> sub2("low_beams", l_callback);
+ros::Subscriber<std_msgs::Int16> sub3("reverse_beams", r_callback);
 
 std_msg::Float32MultiArray bat1[6];
 ros::Publisher pub1("battery_monitor/bat1", &bat1);
@@ -79,6 +88,29 @@ void drive_callback(const geometry_msgs::Twist &drive_msg)
   setWheelVelocity((int)((lin + ang) * 100), (int)((lin - ang) * 100));
 }
 
+  void h_callback(const std_msgs::Int16 &hmsg){
+    if(hmsg.data == 1){
+      digitalWrite(48, HIGH);
+    }else{
+      digitalWrite(48, LOW);
+    }
+  }
+  void l_callback(const std_msgs::Int16 &lmsg){
+    if(lmsg.data == 1){
+      digitalWrite(49, HIGH);
+    }else{
+      digitalWrite(49, LOW);
+    }
+  }
+  void r_callback(const std_msgs::Int16 &rmsg){
+    if(rmsg.data == 1){
+      digitalWrite(50, HIGH);
+    }else{
+      digitalWrite(50, LOW);
+    }
+  }
+
+
 void setup()
 {
   SWSerial.begin(9600); // 9600 is the default baud rate for Sabertooth packet serial.
@@ -87,6 +119,10 @@ void setup()
   FrontST.autobaud();
   RearST.autobaud();
   
+  pinMode(48, OUTPUT);
+  pinMode(49, OUTPUT);
+  pinMode(50, OUTPUT);
+
   pinMode(A0, INPUT);
   pinMode(A1, INPUT);
   pinMode(A2, INPUT);
@@ -102,6 +138,12 @@ void setup()
 
   nh.initNode();
   nh.subscribe(sub);
+  
+  if(use_lights == 1){
+    nh.subscribe(sub1);
+    nh.subscribe(sub2);
+    nh.subscribe(sub3);
+  }
 
   if( use_batt == 1){  
     nh.advertise(pub1);
