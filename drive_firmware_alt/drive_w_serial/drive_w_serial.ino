@@ -51,6 +51,8 @@ void battery_read();
 #define BR 2
 
 int use_batt = 1, use_lights = 1;
+float bat1V[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+float bat2V[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
 Sabertooth FrontST(128, SWSerial); //Address 128 Dip Switches (000111)
 Sabertooth RearST(129, SWSerial);  //Address 130 Dip Switches (000101) Address 129 did not work for some reason
@@ -65,10 +67,10 @@ ros::Subscriber<std_msgs::Int16> sub1("high_beams", h_callback);
 ros::Subscriber<std_msgs::Int16> sub2("low_beams", l_callback);
 ros::Subscriber<std_msgs::Int16> sub3("reverse_beams", r_callback);
 
-std_msg::Float32MultiArray bat1[6];
+std_msgs::Float32MultiArray bat1;
 ros::Publisher pub1("battery_monitor/bat1", &bat1);
 
-std_msg::Float32MultiArray bat2[6];
+std_msgs::Float32MultiArray bat2;
 ros::Publisher pub2("battery_monitor/bat2", &bat2);
 
 void setWheelVelocity(int left, int right)
@@ -157,19 +159,26 @@ void setup()
 }
 
 void battery_read(){
-    bat1[0] = analogRead(A0)
-    bat1[1] = analogRead(A1)
-    bat1[2] = analogRead(A2)
-    bat1[3] = analogRead(A3)
-    bat1[4] = analogRead(A4)
-    bat1[5] = analogRead(A5)
+    bat1V[0] = analogRead(A0);
+    bat1V[1] = analogRead(A1);
+    bat1V[2] = analogRead(A2);
+    bat1V[3] = analogRead(A3);
+    bat1V[4] = analogRead(A4);
+    bat1V[5] = analogRead(A5);
     
-    bat2[0] = analogRead(A6)
-    bat2[1] = analogRead(A7)
-    bat2[2] = analogRead(A8)
-    bat2[3] = analogRead(A9)
-    bat2[4] = analogRead(A10)
-    bat2[5] = analogRead(A11)
+    bat1.data = bat1V;
+
+    bat2V[0] = analogRead(A6);
+    bat2V[1] = analogRead(A7);
+    bat2V[2] = analogRead(A8);
+    bat2V[3] = analogRead(A9);
+    bat2V[4] = analogRead(A10);
+    bat2V[5] = analogRead(A11);
+
+    bat2.data = bat2V;
+
+    pub1.publish(&bat1);
+    pub2.publish(&bat2);
 }
 
 void loop()
