@@ -41,6 +41,9 @@
 SoftwareSerial SWSerial(NOT_A_PIN, 14);
 SoftwareSerial pinROS(NOT_A_PIN, 1);
 void drive_callback(const geometry_msgs::Twist &drive_msg);
+void h_callback(const std_msgs::Int16 &hmsg);
+void l_callback(const std_msgs::Int16 &lmsg);
+void r_callback(const std_msgs::Int16 &rmsg);
 
 #define FR 1
 #define FL 2
