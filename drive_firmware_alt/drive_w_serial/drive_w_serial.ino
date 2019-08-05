@@ -88,27 +88,29 @@ void drive_callback(const geometry_msgs::Twist &drive_msg)
   setWheelVelocity((int)((lin + ang) * 100), (int)((lin - ang) * 100));
 }
 
-  void h_callback(const std_msgs::Int16 &hmsg){
-    if(hmsg.data == 1){
-      digitalWrite(48, HIGH);
-    }else{
-      digitalWrite(48, LOW);
-    }
+void h_callback(const std_msgs::Int16 &hmsg){
+  if(hmsg.data == 1){
+    digitalWrite(48, HIGH);
+  }else{
+    digitalWrite(48, LOW);
   }
-  void l_callback(const std_msgs::Int16 &lmsg){
-    if(lmsg.data == 1){
-      digitalWrite(49, HIGH);
-    }else{
-      digitalWrite(49, LOW);
-    }
+}
+
+void l_callback(const std_msgs::Int16 &lmsg){
+  if(lmsg.data == 1){
+    digitalWrite(49, HIGH);
+  }else{
+    digitalWrite(49, LOW);
   }
-  void r_callback(const std_msgs::Int16 &rmsg){
-    if(rmsg.data == 1){
-      digitalWrite(50, HIGH);
-    }else{
-      digitalWrite(50, LOW);
-    }
+}
+
+void r_callback(const std_msgs::Int16 &rmsg){
+  if(rmsg.data == 1){
+    digitalWrite(50, HIGH);
+  }else{
+    digitalWrite(50, LOW);
   }
+}
 
 
 void setup()
