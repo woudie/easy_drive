@@ -1,0 +1,9 @@
+<launch>
+    <!-- Rosserial Node (Communicates with microcontroller) -->
+    <node pkg="rosserial_python" type="serial_node.py" name="easy_drive_mc" clear_params="true" output="screen" respawn="true">
+      <param name="port" value="$(arg serial_id)" />
+      <param name="baud" value="57600" />
+      <!-- INPUT TOPICS -->
+      <remap from="cmd_vel" to="cmd_vel" />
+    </node>
+</launch>
