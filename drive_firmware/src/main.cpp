@@ -4,7 +4,10 @@
 
 /* ROS imports */
 #include <ros.h>
-#include <geometry_msgs/Twist.h>
+#include <ros/time.h>
+#include <geometry_msgs/Twist.h> 
+
+#include <sensor_msgs/Range.h> 
 
 void drive_callback(const geometry_msgs::Twist& drive_msg);
 
@@ -18,13 +21,26 @@ void drive_callback(const geometry_msgs::Twist& drive_msg);
 #define in3 9
 #define in4 11
 
+// Ultrasonic sensor pins
+#define trigPin A5
+#define echoPin A4
+#define servoPin 3
+
+Servo radServ;
+
 // PWM specs of L298N H-Bridge (Change according to your motor specs)
 #define controllerMax 0   // Default full-reverse input pulse
 #define controllerMin 255 // Default full-forward input pulse
 
 ros::NodeHandle nh;
 double lin, ang;
+int angdir = 0, dir = 0, duration;
+double sensoReading = 0;
+long currtime, publisher_timer;
+char frameid[] = "/ultrasonic_sensor";
 
+sensor_msgs::Range sonar_msg;
+ros::Publisher pub_sonar( "rangeSonar", &sonar_msg);
 ros::Subscriber<geometry_msgs::Twist> sub("cmd_vel", drive_callback);
 
 void motor_set(int num){
@@ -115,6 +131,44 @@ void drive_callback(const geometry_msgs::Twist &drive_msg)
     }
 }
 
+void sonar_read(){
+   // if ((millis() - publisher_timer)> 50 ) 
+   //{
+   digitalWrite(trigPin,LOW);
+   delayMicroseconds(2);
+   digitalWrite(trigPin,HIGH);
+   delayMicroseconds(10);
+   digitalWrite(trigPin,LOW);
+   delayMicroseconds(2);
+
+   duration = pulseIn(echoPin, HIGH);
+   sensoReading = (duration/2)/29.1;
+   //sensoReading = getDistance;
+   sonar_msg.range = sensoReading;
+   //Serial.println(sensoReading);
+   sonar_msg.header.stamp = nh.now();
+   pub_sonar.publish(&sonar_msg);
+   //publisher_timer = millis(); //publish once a second
+   
+   //}
+}
+
+void sonar_move(){
+    if (dir == 0){
+        if(radServ.read() > 134)
+            dir = 1;
+        angdir = radServ.read() + 1;
+        radServ.write(angdir);
+    }else{
+        if(radServ.read() < 46)
+            dir = 0;
+        angdir = radServ.read() - 1;
+        radServ.write(angdir);
+    }
+
+    sonar_read();
+}
+
 void setup(){
     Serial.begin(57600);
     pinMode(enA, OUTPUT);
@@ -123,12 +177,29 @@ void setup(){
     pinMode(in2, OUTPUT);
     pinMode(in3, OUTPUT);
     pinMode(in4, OUTPUT);
+    pinMode(trigPin, OUTPUT);
+    pinMode(echoPin, INPUT);
+    sonar_msg.radiation_type = sensor_msgs::Range::ULTRASOUND;
+    sonar_msg.header.frame_id =  frameid;
+    sonar_msg.field_of_view = (15.0/180.0) * 3.14;
+    sonar_msg.min_range = 0.0;
+    sonar_msg.max_range = 15.0;
+
+    radServ.attach(servoPin);
+    radServ.write(90);
 
     nh.initNode();
     nh.subscribe(sub);
+    nh.advertise(pub_sonar);
+
+    currtime = millis();
 }
 
 void loop(){
+    if(millis() - currtime > 50){
+        currtime = millis();
+        sonar_move();
+    }
     nh.spinOnce();
     delay(1);
 }
