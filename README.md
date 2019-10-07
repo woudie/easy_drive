@@ -23,6 +23,6 @@ Afterwards do the following:
 roslaunch easy_drive drive_robot.launch serial_id:=/dev/ttyUSB0
 ```
 ## Future Improvements
-- Add features for autonomous mode to make it a full druve system
+- Add features for autonomous mode to make it a full drive system
 
 For any questions or concerns please email [woudie](https://github.com/woudie) @ stwoudie@gmail.com
